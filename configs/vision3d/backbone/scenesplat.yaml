@@ -1,0 +1,6 @@
+net:
+  _target_: SceneSplat
+
+path: model/scenesplat/lang-pretrain-ppv2-and-scannet-fixed-all-w-normal-late-contrastive/model_best_lang-pretrain-ppv2-and-scannet-fixed-all-w-normal-late-contrastive.pth
+config_path: model/scenesplat/lang-pretrain-ppv2-and-scannet-fixed-all-w-normal-late-contrastive/config_inference.py
+freeze: True

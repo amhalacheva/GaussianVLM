@@ -1,0 +1,19 @@
+Decoder experiments:
+1: use direct feature from language
+data prep
+- .ply gaussian
+- .pth feature 
+- pointcloud scannetpp undirstort version
+
+2: data processing:
+python pointcept/datasets/preprocessing/scannetpp/preprocess_scannetpp.py --dataset_root ${RAW_SCANNETPP_DIR} --output_root ${PROCESSED_SCANNETPP_DIR} --num_workers ${NUM_WORKERS}
+tasks: extract feature, prune box, and nearest neighbor labelling
+add feature save
+
+
+3: chunk: only for train
+python pointcept/datasets/preprocessing/sampling_chunking_data.py --dataset_root ${PROCESSED_SCANNETPP_DIR} --grid_size 0.01 --chunk_range 6 6 --chunk_stride 3 3 --split train --num_workers ${NUM_WORKERS}
+
+
+
+4: 

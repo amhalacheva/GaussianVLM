@@ -1,0 +1,30 @@
+# train
+training:
+  lr: 3e-4
+  epochs: 5
+
+leomix:
+  mode: [train]
+  dataset: GSMix
+  mix: [gs_obj_scene_cap]
+  ratio: 1.0
+  dataset_wrapper: GSObjPadDatasetWrapper
+  dataset_wrapper_args: ${dataset_wrapper_args}
+  train_dataloader_args: ${dataloader.train}
+  eval_dataloader_args: ${dataloader.eval}
+
+# # eval
+# gs_scene_cap:
+#   mode: [val, test]
+#   dataset: GSSceneCap
+#   dataset_wrapper_args: ${dataset_wrapper_args}
+#   eval_dataloader_args: ${dataloader.eval}
+#   evaluator: CaptionEvaluator
+
+gs_scan2cap:
+  mode: [val, test]
+  dataset: GSScan2Cap
+  dataset_wrapper: GSObjPadDatasetWrapper
+  dataset_wrapper_args: ${dataset_wrapper_args}
+  eval_dataloader_args: ${dataloader.eval}
+  evaluator: CaptionEvaluator

@@ -1,0 +1,6 @@
+net:
+  _target_: SceneSplat
+
+path: ckpt_ptv3.pth
+config_path: config_ptv3.py
+freeze: True

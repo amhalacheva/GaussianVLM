@@ -1,0 +1,80 @@
+scan_family_base: scan_data/scannet_default_fix_xyz_gs_preprocessed
+rscan_base: scan_data/3rscan_3dgs_mcmc_depth_true/grid1mm_chunk6x6_stride3x3
+
+alignment_base: annotations/alignment
+instruction_base: annotations/instruction
+
+max_obj_len: ${dataset_wrapper_args.max_obj_len}
+num_points: 4096
+img_size: [224, 224]
+
+gs_obj_scene_cap:
+  rscan_base: ${data.rscan_base}
+  scannet_base: ${data.scan_family_base}
+  anno_dir: ${data.alignment_base}/obj_scene_caption
+  max_obj_len: ${data.max_obj_len}
+  num_points: ${data.num_points}
+
+# gs_scene_cap:
+#   rscan_base: ${data.rscan_base}
+#   anno_dir: ${data.alignment_base}/scene_caption
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+
+gs_scan2cap:
+  scannet_base: ${data.scan_family_base}
+  anno_dir: ${data.instruction_base}/scan2cap
+  max_obj_len: ${data.max_obj_len}
+  num_points: ${data.num_points}
+  pc_type: gt   # overrided from CLI
+  iou_thres: 0.5
+  corpus: ${data.instruction_base}/scan2cap/scanrefer_corpus.json
+
+gs_scanqa:
+  scannet_base: ${data.scan_family_base}
+  anno_dir: ${data.instruction_base}/scanqa
+  max_obj_len: ${data.max_obj_len}
+  num_points: ${data.num_points}
+  pc_type: gt   # overrided from CLI
+
+gs_sqa3d:
+  scannet_base: ${data.scan_family_base}
+  anno_dir: ${data.instruction_base}/sqa3d
+  max_obj_len: ${data.max_obj_len}
+  num_points: ${data.num_points}
+  pc_type: gt   # overrided from CLI
+
+# rscan_qa:
+#   rscan_base: ${data.rscan_base}
+#   anno_dir: ${data.instruction_base}/3rscanqa
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+
+# rscan_plan:
+#   rscan_base: ${data.rscan_base}
+#   anno_dir: ${data.instruction_base}/planning
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+
+# rscan_dialog:
+#   rscan_base: ${data.rscan_base}
+#   anno_dir: ${data.instruction_base}/dialogue
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+
+# mp3d_objnav:
+#   base_dir: ${data.instruction_base}/mp3d_objnav
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+#   max_traj_len: 500
+#   history_length: 4
+#   num_pred: 1
+#   img_size: ${data.img_size}
+#   scene_object_deterministic: True   # if so, the same objects will be sampled for a scene
+
+# cliport:
+#   base_dir: ${data.instruction_base}/cliport
+#   max_obj_len: ${data.max_obj_len}
+#   num_points: ${data.num_points}
+#   history_length: 4
+#   img_size: ${data.img_size}

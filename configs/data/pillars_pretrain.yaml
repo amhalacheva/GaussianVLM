@@ -1,0 +1,20 @@
+scan_family_base: scan_data/scannet
+rscan_base: scan_data/rscan
+cap3d_base: scan_data/cap3d
+
+max_obj_len: ${dataset_wrapper_args.max_obj_len}
+num_points: 4096
+max_points_pillar: 1500
+img_size: [224, 224]
+
+# cap3d_pillars:
+#   cap3d_pillars_train: ${data.cap3d_base}/Cap3D_pillars
+#   cap3d_pillars_obj_train: ${data.cap3d_base}/Cap3D_pillars_obj
+#   num_points: ${data.num_points}
+
+scan_pillars:
+  rscan_base: ${data.rscan_base}
+  scannet_base: ${data.scan_family_base}
+  #anno_dir: ${data.alignment_base}/obj_scene_caption
+  max_obj_len: ${data.max_obj_len}
+  num_points: ${data.num_points}

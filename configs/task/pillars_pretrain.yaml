@@ -1,0 +1,32 @@
+# train
+training:
+  lr: 0.001
+  epochs: 700
+
+leomix:
+  mode: [train]
+  dataset: LeoMix
+  mix: [scan_pillars] #ToDo[cap3d_pillars, scan_pillars]
+  ratio: 1.0
+  dataset_wrapper: LeoObjPadDatasetWrapper
+  dataset_wrapper_args: ${dataset_wrapper_args}
+  train_dataloader_args: ${dataloader.train}
+  eval_dataloader_args: ${dataloader.eval}
+
+# eval
+# cap3d_pillars:
+#   mode: [val, test]
+#   dataset: Cap3DPillars
+#   dataset_wrapper: LeoObjPadDatasetWrapper
+#   dataset_wrapper_args: ${dataset_wrapper_args}
+#   eval_dataloader_args: ${dataloader.eval}
+#   evaluator: CaptionEvaluator
+
+scan_pillars:
+  mode: [val, test]
+  dataset: ScanPillars
+  dataset_wrapper: LeoObjPadDatasetWrapper
+  dataset_wrapper_args: ${dataset_wrapper_args}
+  eval_dataloader_args: ${dataloader.eval}
+  evaluator: CaptionEvaluator
+

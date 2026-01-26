@@ -1,0 +1,6 @@
+evaluator/ngram_metrics/meteor/data/paraphrase-en.gz !text !filter !merge !diff
+evaluator/ngram_metrics/meteor/meteor-1.5.jar !text !filter !merge !diff
+*.zip filter=lfs diff=lfs merge=lfs -text
+model/scenesplat/lang-pretrain-ppv2-and-scannet-fixed-all-w-normal-late-contrastive.zip filter=lfs diff=lfs merge=lfs -text
+evaluator/ngram_metrics/meteor/data/paraphrase-en.gz !text !filter !merge !diff
+evaluator/ngram_metrics/meteor/meteor-1.5.jar !text !filter !merge !diff

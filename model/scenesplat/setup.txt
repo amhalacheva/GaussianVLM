@@ -1,0 +1,113 @@
+cd embodied-generalist/model/scenesplat/
+conda create -n gscept_linear_1 -y python=3.10
+conda activate gscept_linear_1
+conda install -c nvidia cuda-nvcc==12.1
+conda install conda-forge::ninja
+conda install -c nvidia cuda-toolkit==12.1
+pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --index-url https://download.pytorch.org/whl/cu121
+pip install einops
+pip install transformers==4.46.0
+pip install datasets==2.21.0
+pip install causal-conv1d==1.4.0
+MAX_JOBS=4 pip install flash-attn --no-build-isolation
+pip install h5py pyyaml sharedarray tensorboard tensorboardx yapf addict scipy plyfile termcolor timm 
+pip install torch-cluster torch-scatter torch-sparse torch-geometric
+pip install spconv-cu121
+
+cd libs/pointops
+TORCH_CUDA_ARCH_LIST="7.5 8.0 8.6 8.9 9.0" python  setup.py install
+cd ../..
+pip install open3d
+pip install git+https://github.com/fishbotics/pointnet2_ops.git
+
+
+
+# LEO
+pip install accelerate==0.26.1
+pip install easydict==1.10
+pip install einops==0.6.1
+pip install fschat==0.2.7
+pip install fvcore==0.1.5.post20221221
+pip install hydra-core==1.3.2
+pip install jsonlines==3.1.0
+pip install nltk==3.8.1
+pip install numpy==1.25.0 
+pip install numpy-quaternion
+pip install omegaconf==2.3.0
+pip install openai-clip
+pip install opencv-python==4.7.0.72
+pip install sentence-transformers==2.2.2
+pip install submitit==1.4.5
+pip install transforms3d
+pip install trimesh==3.22.3
+pip install peft==0.5.0 --no-deps   
+pip install huggingface_hub==0.13.4
+pip install datasets==2.0.0
+pip install evaluate==0.3.0
+pip install protobuf==3.20.0
+pip install timm==0.9.7
+
+conda install mkl=2024.0
+
+export PYTHONPATH=/home/jovyan/workspace/embodied-generalist/model/scenesplat/:$PYTHONPATH
+
+
+python launch.py --name leo_align \
+                 --mode accelerate \
+                 --mem_per_gpu 80 \
+                 --time 48 \
+                 --config configs/default.yaml \
+                 --gpu_per_node 8 \
+                 --num_nodes 1 \
+                 task=align \
+                 note=align_lora
+
+python launch.py --mode accelerate \
+                 --mem_per_gpu 80 \
+                 --time 48 \
+                 --config configs/gs.yaml \
+                 --gpu_per_node 8 \
+                 --num_nodes 1 
+
+
+python launch.py --mode accelerate \
+                 --mem_per_gpu 80 \
+                 --time 48 \
+                 --config configs/gs_tuning.yaml \
+                 --gpu_per_node 4 \
+                 --num_nodes 1 \
+                 task=gs_tuning_noact 
+
+sudo apt install git-lfs
+git lfs install
+
+
+ File "/home/jovyan/workspace/embodied-generalist/model/build.py", line 6, in build_module
+    return MODULE_REGISTRY.get(cfg.name)(cfg)
+  File "/home/jovyan/workspace/embodied-generalist/model/vision3d.py", line 240, in __init__
+    self.scene_transformer = PointcloudBackbone(cfg.backbone)
+  File "/home/jovyan/workspace/embodied-generalist/model/pcd_backbone.py", line 28, in __init__
+    self.pcd_net = create_pointcept(cfg)
+  File "/home/jovyan/workspace/embodied-generalist/model/scenesplat/model_build.py", line 30, in create_pointcept
+    model = build_model_pointcept(config.model)
+  File "/home/jovyan/workspace/embodied-generalist/model/scenesplat/pointcept/models/builder.py", line 16, in build_model
+    return MODELS.build(cfg)
+  File "/home/jovyan/workspace/embodied-generalist/model/scenesplat/pointcept/utils/registry.py", line 214, in build
+    return self.build_func(*args, **kwargs, registry=self)
+  File "/home/jovyan/workspace/embodied-generalist/model/scenesplat/pointcept/utils/registry.py", line 56, in build_from_cfg
+    raise type(e)(f"{obj_cls.__name__}: {e}")
+KeyError: "LangPretrainer: 'PT-v3m1 is not in the models registry'"
+
+
+
+
+
+
+
+ File "/home/jovyan/workspace/embodied-generalist/run.py", line 33, in main
+    trainer.run()
+  File "/home/jovyan/workspace/embodied-generalist/trainer/leo_trainer.py", line 310, in run
+    self.train_step(epoch)
+  File "/home/jovyan/workspace/embodied-generalist/trainer/leo_trainer.py", line 172, in train_step
+    is_txt_data = [(s not in self.eai_task_sources) for s in data_dict['source']]
+TypeError: string indices must be integers

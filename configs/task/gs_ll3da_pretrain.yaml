@@ -1,0 +1,73 @@
+# train
+training:
+  lr: 3e-4
+  epochs: 5
+
+leomix:
+  mode: [train]
+  dataset: GSMix
+  mix: [gs_scan2cap, gs_nr3d]
+  ratio: 1.0
+  dataset_wrapper: GSObjPadDatasetWrapper
+  dataset_wrapper_args: ${dataset_wrapper_args}
+  train_dataloader_args: ${dataloader.train}
+  eval_dataloader_args: ${dataloader.eval}
+
+
+
+gs_scan2cap:
+  mode: [val, test]
+  dataset: GSScan2Cap
+  dataset_wrapper: GSObjPadDatasetWrapper
+  dataset_wrapper_args: ${dataset_wrapper_args}
+  eval_dataloader_args: ${dataloader.eval}
+  evaluator: CaptionEvaluator
+
+# gs_scanqa:
+#   mode: [val, test]
+#   dataset: GSScanQA
+#   dataset_wrapper: GSObjPadDatasetWrapper
+#   dataset_wrapper_args: ${dataset_wrapper_args}
+#   eval_dataloader_args: ${dataloader.eval}
+#   evaluator: ScanQAEvaluator
+
+gs_nr3d:
+  mode: [val, test]
+  dataset: GSNr3D
+  dataset_wrapper: GSObjPadDatasetWrapper
+  dataset_wrapper_args: ${dataset_wrapper_args}
+  eval_dataloader_args: ${dataloader.eval}
+  evaluator: CaptionEvaluator
+
+# gs_scene_cap_3dllm:
+#   mode: [val, test]
+#   dataset: GSSceneCap3DLLM
+#   dataset_wrapper: GSObjPadDatasetWrapper
+#   dataset_wrapper_args: ${dataset_wrapper_args}
+#   eval_dataloader_args: ${dataloader.eval}
+#   evaluator: CaptionEvaluator
+
+
+# gs_dialog_3dllm:
+#   mode: [val, test]
+#   dataset: GSDialog3DLLM
+#   dataset_wrapper: GSObjPadDatasetWrapper
+#   dataset_wrapper_args: ${dataset_wrapper_args}
+#   eval_dataloader_args: ${dataloader.eval}
+#   evaluator: CaptionEvaluator
+
+# gs_plan_3dllm:
+#   mode: [val, test]
+#   dataset: GSPlan3DLLM
+#   dataset_wrapper: GSObjPadDatasetWrapper
+#   dataset_wrapper_args: ${dataset_wrapper_args}
+#   eval_dataloader_args: ${dataloader.eval}
+#   evaluator: CaptionEvaluator
+
+# gs_qa_3dllm:
+#   mode: [val, test]
+#   dataset: GSQA3DLLM
+#   dataset_wrapper: GSObjPadDatasetWrapper
+#   dataset_wrapper_args: ${dataset_wrapper_args}
+#   eval_dataloader_args: ${dataloader.eval}
+#   evaluator: ScanQAEvaluator
