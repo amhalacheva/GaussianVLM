@@ -1,7 +1,9 @@
 # GaussianVLM: Scene-centric 3D Vision-Language Models using Language-aligned Gaussian Splats for Embodied Reasoning and Beyond
 
-[**Project Page**](https://insait-institute.github.io/gaussianvlm.github.io/) | [**Paper (arXiv)**](https://arxiv.org/abs/2507.00886) | [**Evaluation Results**](https://huggingface.co/datasets/amhalacheva/GaussianVLM_results)
+[Anna-Maria Halacheva](https://insait.ai/anna-maria-halacheva/) | [Jan-Nico Zaech](https://jannicozaech.github.io/) | [Xi Wang](https://xiwang1212.github.io/homepage/) | [Danda Pani Paudel](https://insait.ai/dr-danda-paudel/) | [Luc Van Gool](https://insait.ai/prof-luc-van-gool/)
 
+---
+[**🌐 Project Page**](https://insait-institute.github.io/gaussianvlm.github.io/) | [**📃 Paper (arXiv)**](https://arxiv.org/abs/2507.00886) | [**📊 Evaluation Results**](https://huggingface.co/datasets/amhalacheva/GaussianVLM_results)
 ---
 
 ## 📢 Important Note on This Release
