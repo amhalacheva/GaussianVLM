@@ -290,8 +290,8 @@ class GSAgent(nn.Module):
         # 3D vision 
         self.pcd_encoder = build_module(cfg.vision3d)
         self.text_attention_pool = LearnedAttentionPooling(128, 768)
-        self.text_3dvis_crossattent = GSDecoder(query_dim=768, kv_dims=[256,128,768], embed_dim=768, num_heads=4, dropout=0.1)
-        # self.text_3dvis_crossattent = GSDecoder(query_dim=768, kv_dims=[768,768,768], embed_dim=768, num_heads=4, dropout=0.1)
+        # self.text_3dvis_crossattent = GSDecoder(query_dim=768, kv_dims=[256,512,768], embed_dim=768, num_heads=4, dropout=0.1)
+        self.text_3dvis_crossattent = GSDecoder(query_dim=768, kv_dims=[768,768,768], embed_dim=768, num_heads=4, dropout=0.1)
         self.pos_embed = nn.Embedding(128, 768)
         self.cache = {}
         self.siglip_txt_model = AutoModel.from_pretrained("siglip2-base-patch16-512/").text_model.to('cuda')

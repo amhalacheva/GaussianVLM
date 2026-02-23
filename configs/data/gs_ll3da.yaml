@@ -1,12 +1,16 @@
-scan_family_base: scan_data/scannet_default_fix_xyz_gs_preprocessed
-ll3da_base: /scratch/anna_maria_halacheva/annotations/annotations/LL3DA_annotations
+# Scans, GS
+scan_family_base: TBD/scannet_default_fix_xyz_gs_preprocessed_no_feat
 
-alignment_base: /scratch/anna_maria_halacheva/annotations/annotations/alignment
-instruction_base: /scratch/anna_maria_halacheva/annotations/annotations/instruction
+# Annotations
+ll3da_base: /GaussianVLM_training_data/LL3DA_annotations
+leo_base: /GaussianVLM_training_data
+
 
 max_obj_len: ${dataset_wrapper_args.max_obj_len}
 num_points: 4096
 img_size: [224, 224]
+
+
 
 gs_nr3d:
   scannet_base: ${data.scan_family_base}
@@ -38,36 +42,26 @@ gs_dialog_3dllm:
   max_obj_len: ${data.max_obj_len}
   num_points: ${data.num_points}
 
-
-# gs_obj_scene_cap:
-#   rscan_base: ${data.rscan_base}
-#   scannet_base: ${data.scan_family_base}
-#   anno_dir: ${data.alignment_base}/obj_scene_caption
-#   max_obj_len: ${data.max_obj_len}
-#   num_points: ${data.num_points}
-
-
 gs_scan2cap:
   scannet_base: ${data.scan_family_base}
-  anno_dir: ${data.instruction_base}/scan2cap
+  anno_dir: ${data.leo_base}/Scan2Cap
   max_obj_len: ${data.max_obj_len}
   num_points: ${data.num_points}
   pc_type: gt   # overrided from CLI
   iou_thres: 0.5
-  corpus: ${data.instruction_base}/scan2cap/scanrefer_corpus.json
+  corpus: ${data.leo_base}/Scan2Cap/scanrefer_corpus.json
 
 gs_scanqa:
   scannet_base: ${data.scan_family_base}
-  anno_dir: ${data.instruction_base}/scanqa
+  anno_dir: ${data.leo_base}/ScanQA_Leo
   max_obj_len: ${data.max_obj_len}
   num_points: ${data.num_points}
   pc_type: gt   # overrided from CLI
 
-# gs_sqa3d:
-#   scannet_base: ${data.scan_family_base}
-#   anno_dir: ${data.instruction_base}/sqa3d
-#   max_obj_len: ${data.max_obj_len}
-#   num_points: ${data.num_points}
-#   pc_type: gt   # overrided from CLI
-
+gs_sqa3d:
+  scannet_base: ${data.scan_family_base}
+  anno_dir: ${data.leo_base}/SQa3D_Leo
+  max_obj_len: ${data.max_obj_len}
+  num_points: ${data.num_points}
+  pc_type: gt   # overrided from CLI
 

@@ -1,26 +1,27 @@
 defaults:
-  - data: ptv3
+  - data: gs_ll3da
   - task: gs_ll3da
   - llm: opt1.3b
   - vision2d: convnext
-  - vision3d: ptv3
+  - vision3d: gs_scenesplat
   - _self_
 
 # exp general info
-name: TODO  # project name of wandb
-note: TODO   # run name of wandb
+name: TBD
+note: gaussianvlm
 
 rng_seed: 42
-num_gpu: 8   # will be overrided by launch.py
+num_gpu: 8
 mode: train
-naming_keywords: [note]   # choose keywords to feature the exp run dir
-base_dir: TODO
-exp_dir: ""   # temporarily empty, will be set by run.py as base_dir + name + *naming_keywords
-pretrained_ckpt_path: TODO
+naming_keywords: [note]
+base_dir: training_results/
+exp_dir: ""
+pretrained_ckpt_path: ""
+structured_answers: False
 
 logger:
   name: wandb
-  entity: TODO
+  entity: TBD
 
 dataset_wrapper_args:
   max_obj_len: 40000
@@ -60,8 +61,8 @@ clip_txt_guidance:
 
 # inference
 probe:
-  sources: [3rscan]
-  scene_ids: [0cac75d0-8d6f-2d13-8c26-d771a31c3f50]
+  sources: [TBD]
+  scene_ids: [TBD]
   situations: ""
   instructions: [Describe this scene.]
   save_obj_tokens: True

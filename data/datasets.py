@@ -2185,30 +2185,29 @@ class GSBase(Dataset):
         return {"feat": merged, "coord": data_dict["coord"], "grid_size": data_dict["grid_size"]}
 
     def load_scannet_scene_strategy(self, scan_id):
-        self.scannet_base = "/scratch/anna_maria_halacheva/scannet_pointcept"
         data_dict = {}
         if self.split =="train":
-            data_path = os.path.join("/scratch/anna_maria_halacheva/scannet_pointcept",self.split, scan_id)
+            data_path = os.path.join(self.scannet_base, self.split,self.split, scan_id)
             #data_path = "scan_data/scannet/train/scene0003_00" #DEBUG
             try:
                 assets = os.listdir(data_path)
             except:
                 try:
-                    data_path = os.path.join(self.scannet_base,"val", scan_id)
+                    data_path = os.path.join(self.scannet_base,"val","val", scan_id)
                     assets = os.listdir(data_path)
                 except:
-                    data_path = os.path.join(self.scannet_base,"test", scan_id)
+                    data_path = os.path.join(self.scannet_base,"test","test", scan_id)
                     assets = os.listdir(data_path)
         else:
-            data_path = os.path.join(self.scannet_base,"val", scan_id)
+            data_path = os.path.join(self.scannet_base,"val","val", scan_id)
             try:
                 assets = os.listdir(data_path)
             except:
                 try:
-                    data_path = os.path.join(self.scannet_base,"train", scan_id)
+                    data_path = os.path.join(self.scannet_base,"train","train", scan_id)
                     assets = os.listdir(data_path)
                 except:
-                    data_path = os.path.join(self.scannet_base,"test", scan_id)
+                    data_path = os.path.join(self.scannet_base,"test","test", scan_id)
                     assets = os.listdir(data_path)
         for asset in assets:
             if not asset.endswith(".npy"):
@@ -2221,9 +2220,9 @@ class GSBase(Dataset):
         data_dict['scene_center'] = (data_dict["coord"].max(0)[0] + data_dict["coord"].min(0)[0]) / 2
         data_dict["color"] = torch.tensor(data_dict["color"].astype(np.float32)/ 127.5 - 1)
         data_dict["normal"] = torch.tensor(data_dict["normal"].astype(np.float32))
-        #data_dict["quat"] = torch.tensor(data_dict["quat"].astype(np.float32))
-        #data_dict["scale"] = torch.tensor(data_dict["scale"].astype(np.float32))
-        #data_dict["opacity"] = torch.tensor(data_dict["opacity"].astype(np.float32))
+        data_dict["quat"] = torch.tensor(data_dict["quat"].astype(np.float32))
+        data_dict["scale"] = torch.tensor(data_dict["scale"].astype(np.float32))
+        data_dict["opacity"] = torch.tensor(data_dict["opacity"].astype(np.float32))
 
         N = data_dict["coord"].shape[0]
         num_samples = 40000
@@ -2235,15 +2234,15 @@ class GSBase(Dataset):
         indices = torch.randperm(N)[:actual_samples]
         
         ##### 'color', 'opacity', 'quat', 'scale', 'normal' according to "feat_keys" in config in lang-pretrain-ppv2..
-        #data_dict["opacity"] = data_dict["opacity"].unsqueeze(1) if data_dict["opacity"].dim() == 1 else data_dict["opacity"]
+        data_dict["opacity"] = data_dict["opacity"].unsqueeze(1) if data_dict["opacity"].dim() == 1 else data_dict["opacity"]
 
         data_dict["coord"]-=data_dict["scene_center"]
 
         merged = torch.cat([
             data_dict["color"],
-            #data_dict["opacity"],
-            #data_dict["quat"],
-            #data_dict["scale"],
+            data_dict["opacity"],
+            data_dict["quat"],
+            data_dict["scale"],
             data_dict["normal"],
         ], dim=-1)  # Final shape: [N, 14]
         # Optional: assign to a key
@@ -3011,7 +3010,7 @@ class GSSceneCap3DLLM(GSBase):
             #self.pc_type = getattr(cfg.data.scene_cap_3dllm, 'pc_type', 'gt')
 
         logger.info(f"Loading GSSceneCap3DLLM {split}-set language")
-        self.scan_ids, self.lang_data = self.load_anno("annotations/LL3DA_annotations/3D_LLM")
+        self.scan_ids, self.lang_data = self.load_anno(cfg.data.gs_scene_cap_3dllm.anno_dir)
         # scan_ids may be repeatitive
         logger.info(f"Finish loading GSSceneCap3DLLM {split}-set language, collected {len(self.scan_ids)} data")
 

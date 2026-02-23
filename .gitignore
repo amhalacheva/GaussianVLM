@@ -174,4 +174,4 @@ Meta-Llama-3-8B_hf/
 pointnetpp_vil3dref.pth
 training_results/
 vicuna-7b/
-model/scenesplat/lang-pretrain-ppv2-and-scannet-fixed-all-w-normal-late-contrastive/
+model/scenesplat/lang-pretrain-ppv2-and-scannet-fixed-all-w-normal-late-contrastive/GSPlan_anno/

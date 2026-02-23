@@ -77,7 +77,7 @@ class PointcloudBackbone(nn.Module):
 
     def forward_scenesplat(self, obj_pcds, scene_id):
         # obj_pcds: (batch_size, num_objs, num_points, 6)
-        obj_embeds = self.pcd_net(obj_pcds)
+        obj_embeds = self.pcd_net(obj_pcds, scene_id)
         return obj_embeds
 
     @torch.no_grad()
@@ -118,4 +118,3 @@ class PointcloudBackbone(nn.Module):
     #     if not cfg.resume:
     #         cfg.dump(os.path.join(cfg.save_path, "config.py"))
     #     return cfg
-

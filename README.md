@@ -8,7 +8,7 @@
 We are releasing this as an early-access version of the codebase due to multiple requests from the community. 
 
 > [!CAUTION]
-> This is an **early release**. A more detailed set of instructions and a thoroughly cleaned repository for easier setup will be released in the upcoming weeks. For immediate setup help or specific queries, please **contact the first author**.
+> This is an **early release**. A thoroughly cleaned repository for easier setup will be released in the upcoming weeks. For urgent issues, please **contact the first author**.
 
 ---
 
@@ -36,3 +36,39 @@ To ensure environment reproducibility, we provide a [pre-packaged environment](h
    source gaussian_vlm_env/bin/activate
    conda-unpack
   ```
+
+### Backbones & Data Setup
+   ```bash
+   cd GaussianVLM
+   # Annotations
+   git clone https://huggingface.co/datasets/amhalacheva/GaussianVLM_training_data
+   # Opt (or another LLM) and SigLip2
+   git clone https://huggingface.co/facebook/opt-1.3b
+   git clone https://huggingface.co/google/siglip2-base-patch16-512
+
+   # Clone SceneSplat 3D GS Backbone 
+   cd model/scenesplat/
+   git clone https://huggingface.co/amhalacheva/GaussianVLM_SceneSplat
+   ```
+
+   Please, also download `GaussianWorld/scannet_default_fix_xyz_gs_preprocessed_no_feat` from HuggingFace for 3DGS ScanNet scenes.
+
+### Example 
+
+   ```bash
+   export PYTHONPATH=model/scenesplat:$PYTHONPATH
+   export PYTHONPATH=evaluator:$PYTHONPATH
+   export CUDA_HOME="/opt/modules/nvidia-cuda-12.4.1"
+   export LD_LIBRARY_PATH="$CUDA_HOME/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+   export PATH=/opt/modules/nvidia-cuda-12.4.1/bin:$PATH
+   export CC=/opt/modules/gcc-10.5.0/bin/gcc
+   export CXX=/opt/modules/gcc-10.5.0/bin/g++
+   export TORCH_CUDA_ARCH_LIST="8.6"
+
+   python launch.py --mode accelerate --mem_per_gpu  80  --time 48  --config configs/gs_ll3da_train.yaml --gpu_per_node 1 --num_nodes 1 num_gpu=8
+   ```
+
+Please, modify the configs files according to your setup!
+- `gs_ll3da_pretrain.yaml` gives the pretraining configuration
+- `gs_ll3da_train.yaml ` - the training setup
+

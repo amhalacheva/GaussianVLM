@@ -7,7 +7,6 @@ from model.build import MODULE_REGISTRY
 from model.pcd_backbone import PointcloudBackbone
 from model.transformers import TransformerEncoderLayer, TransformerSpatialEncoderLayer
 from model.utils import calc_pairwise_locs, layer_repeat, _init_weights_bert
-from model.knn_sparsify import Group
 from torch.nn.utils.rnn import pad_sequence
 
 logger = get_logger(__name__)
@@ -207,13 +206,11 @@ class OSE3D(nn.Module):
 
 
 class LearnedAttentionPooling(nn.Module):
-    def __init__(self, num_queries=4, input_dim=64, feature_dim=768):
+    def __init__(self, num_queries, feature_dim):
         super(LearnedAttentionPooling, self).__init__()
         # Learnable query tokens - shape [num_queries, feature_dim]
-
-        self.query_tokens = nn.Parameter(torch.randn(num_queries, feature_dim))
-        self.proj = nn.Linear(input_dim, feature_dim)      
-           
+        self.query_tokens = nn.Parameter(torch.randn(num_queries, feature_dim, device="cuda"))
+        
     def forward_old(self, dense_features):
         # Dense features (K, V): [B, num_features, feature_dim]
         # Learnable queries (Q): [num_queries, feature_dim]
@@ -232,20 +229,23 @@ class LearnedAttentionPooling(nn.Module):
 
 
     def forward(self, dense_features, attention_mask=None):
-        B, N, _ = dense_features.shape
-        # Project input features to 768 dim
-        features = self.proj(dense_features)  # [B, N, 768]
+        """
+        dense_features: [B, num_features, feature_dim]
+        attention_mask: [B, num_features] with 1s for valid tokens and 0s for padding
+        """
+        B, num_features, _ = dense_features.shape
+        queries = self.query_tokens.unsqueeze(0).expand(B, -1, -1)  # [B, num_queries, feature_dim]
 
-        queries = self.query_tokens.unsqueeze(0).expand(B, -1, -1)  # [B, 4, 768]
-
-        attention_scores = torch.bmm(queries, features.transpose(1, 2))  # [B, 4, N]
+        # QK^T
+        attention_scores = torch.bmm(queries, dense_features.transpose(1, 2))  # [B, num_queries, num_features]
 
         if attention_mask is not None:
-            attention_mask = attention_mask.unsqueeze(1)  # [B, 1, N]
+            # Mask out padded positions by setting them to a large negative value before softmax
+            attention_mask = attention_mask.unsqueeze(1)  # [B, 1, num_features]
             attention_scores = attention_scores.masked_fill(attention_mask == 0, float('-inf'))
 
-        attention_weights = torch.softmax(attention_scores, dim=-1)  # [B, 4, N]
-        output = torch.bmm(attention_weights, features)  # [B, 4, 768]
+        attention_weights = torch.softmax(attention_scores, dim=-1)  # [B, num_queries, num_features]
+        output = torch.bmm(attention_weights, dense_features)  # [B, num_queries, feature_dim]
 
         return output
 
@@ -255,7 +255,7 @@ class ROIAttentionPool(nn.Module):
         super().__init__()
         self.radius = torch.tensor(radius).to("cuda")
         self.in_dim = lang_feat_dim
-        self.pool = LearnedAttentionPooling(queries_count, feature_dim=lang_feat_dim, input_dim=64)
+        self.pool = LearnedAttentionPooling(queries_count, lang_feat_dim)
         self.norm = nn.LayerNorm(lang_feat_dim)
 
     def compute_roi_feats(self, xyz, feat, poi, radius):
@@ -353,15 +353,11 @@ class UniformDownsample(nn.Module):
         """
         super(UniformDownsample, self).__init__()
         self.num_samples = num_samples
-        self.cut_xyz=False
+
         # If out_dim is given, we build a projection layer
         if out_dim is not None:
             assert in_dim is not None, "in_dim must be specified when using projection"
-            if in_dim==67:
-                self.proj = nn.Linear(64, out_dim)
-                self.cut_xyz=True
-            else:
-                self.proj = nn.Linear(in_dim, out_dim)
+            self.proj = nn.Linear(in_dim, out_dim)
         else:
             self.proj = None
 
@@ -389,12 +385,7 @@ class UniformDownsample(nn.Module):
 
         # Apply projection if defined
         if self.proj is not None:
-            if self.cut_xyz:
-                sampled_features_xyz =sampled_features[..., :3]
-                sampled_features = self.proj(sampled_features[..., 3:])
-                sampled_features = torch.cat([sampled_features_xyz, sampled_features], dim=-1)
-            else:
-                sampled_features = self.proj(sampled_features)  # [B, num_samples, out_dim]
+            sampled_features = self.proj(sampled_features)  # [B, num_samples, out_dim]
 
         return sampled_features
 
@@ -408,9 +399,9 @@ class GS_SceneSplat_Wrapper(nn.Module):
 
         # pcd backbone
         self.scene_transformer = PointcloudBackbone(cfg.backbone)
-        self.scene_sparsify_1 = UniformDownsample(512, in_dim=256, out_dim=256)
-        self.scene_sparsify_2 = UniformDownsample(512, in_dim=128, out_dim=128)
-        self.scene_sparsify_3 = UniformDownsample(512, in_dim=67, out_dim=768)
+        self.scene_sparsify_1 = UniformDownsample(512, in_dim=256, out_dim=768)
+        self.scene_sparsify_2 = UniformDownsample(512, in_dim=512, out_dim=768)
+        self.scene_sparsify_3 = UniformDownsample(512)
         self.roi_pool = ROIAttentionPool()
         self.pos_emb = LearnableFourier()
 
@@ -419,6 +410,8 @@ class GS_SceneSplat_Wrapper(nn.Module):
 
         #ROI
         self.radius = 0.3
+        self.in_dim = 768
+        self.pool = LearnedAttentionPooling(4, 768)
 
     @property
     def device(self):
@@ -569,7 +562,6 @@ class GS_SceneSplat_Wrapper(nn.Module):
         
         for b_idx in range(B):
             mask = attention_masks[2][b_idx].to(scene_pointclouds.device)
-            
             selected_points = scene_pointclouds[b_idx][mask]  # [num_valid, C]
             selected_points = selected_points.unsqueeze(0)  # [1, num_valid, C]
         
@@ -600,4 +592,3 @@ class GS_SceneSplat_Wrapper(nn.Module):
         data_dict["scene_tokens"] = vis_tokens_for_crossattent
 
         return data_dict
-
